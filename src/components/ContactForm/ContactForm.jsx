@@ -1,24 +1,17 @@
-import React from "react";
 import s from "./ContactForm.module.css";
 import { nanoid } from "nanoid";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import ReactInputMask from "react-input-mask";
+import { useDispatch } from "react-redux";
+import { useId } from "react";
+import { addContact } from "../../redux/contactsSlice";
 
-const ContactForm = ({ setContacts }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+
   const initialValues = {
     name: "",
     number: "",
-  };
-
-  const handleAdd = (values, options) => {
-    const newContact = {
-      id: nanoid(),
-      name: values.name,
-      number: values.number,
-    };
-    setContacts((prev) => [...prev, newContact]);
-    options.resetForm();
   };
 
   const CheckSchema = Yup.object().shape({
@@ -32,6 +25,19 @@ const ContactForm = ({ setContacts }) => {
       .required("Required"),
   });
 
+  const nameId = useId();
+  const numberId = useId();
+
+  const handleAdd = (values, actions) => {
+    const newContact = {
+      id: nanoid(),
+      name: values.name,
+      number: values.number,
+    };
+    dispatch(addContact(newContact));
+    actions.resetForm();
+  };
+
   return (
     <div className={s.container}>
       <Formik
@@ -42,12 +48,12 @@ const ContactForm = ({ setContacts }) => {
         <Form>
           <label className={s.label}>
             Name
-            <Field className={s.input} name="name" />
+            <Field className={s.input} name="name" id={nameId} />
             <ErrorMessage name="name" component="div" className={s.error} />
           </label>
           <label className={s.label}>
             Number
-            <Field name="number" className={s.input} />
+            <Field name="number" className={s.input} id={numberId} />
             <ErrorMessage name="number" component="div" className={s.error} />
           </label>
           <button type="submit" className={s.btn}>
